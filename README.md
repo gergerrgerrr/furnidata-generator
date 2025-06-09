@@ -3,6 +3,7 @@
 This python script generates:
   - furnidata.txt (Your JSON entries for the furnitures that you are adding.)
   - SQL insert statements for `items_base` and `catalog_items` tables in catalog_items_sql.txt and items_base_sql.txt respectively.
+  - The default costs for the furniture in the catalogue would be 50 duckets, you may change it to suit your needs.
 
 I made this for people who do not have automated furniture adding in their housekeeping, as I have came across that issue in the past.
 
