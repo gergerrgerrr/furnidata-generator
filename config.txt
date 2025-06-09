@@ -1,3 +1,5 @@
-starting_id = 106
-page_id = 369369
-starting_cata_id = 7
+nitro_path = YOUR PATH HERE
+starting_id = 1
+page_id = 111
+starting_cata_id = 1
+

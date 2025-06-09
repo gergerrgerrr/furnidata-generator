@@ -11,9 +11,10 @@ Requirements:
 1. You will need **Python 3.x**
 2. Furnitures in **.nitro** to put into the "**/furni**" folder
 3. Do remember to edit the "**config.txt**"
-   **starting_id** = The starting id for your items_base/furnidata id
-   **page_id** = The page id that you want the furnitures to be under **Note that this value will not change by itself and you have to modify it whenever necessary.**
-   **starting_cata_id** = Some sprite_ids might not match your cata_ids, so this would solve the issue
+   **starting_id** = The starting id for your items_base/furnidata id.
+   **page_id** = The page id that you want the furnitures to be under. **Note that this value will not change by itself and you have to modify it whenever necessary.**
+   **starting_cata_id** = Some sprite_ids might not match your cata_ids, so this would solve the issue.
+   **nitro_path** = Path to the **/furni** folder.
 
 To run this script:
 Open command prompt at the main folder and run ```python generateall.py```

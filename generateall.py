@@ -1,11 +1,13 @@
 import os
 import json
+import sys
 
 
 def read_config(filename="config.txt"):
     starting_id = 1
     page_id = 1
     starting_cata_id = 1
+    nitro_path = ""
     try:
         with open(filename, "r") as f:
             for line in f:
@@ -16,12 +18,14 @@ def read_config(filename="config.txt"):
                     page_id = int(line.split("=")[1].strip())
                 elif line.startswith("starting_cata_id"):
                     starting_cata_id = int(line.split("=")[1].strip())
+                elif line.startswith("nitro_path"):
+                    nitro_path = line.split("=", 1)[1].strip()
     except (FileNotFoundError, ValueError):
         pass
-    return starting_id, page_id, starting_cata_id
+    return starting_id, page_id, starting_cata_id, nitro_path
 
 
-def write_config(starting_id, page_id, starting_cata_id, filename="config.txt"):
+def write_config(starting_id, page_id, starting_cata_id, nitro_path="", filename="config.txt"):
     lines = []
     try:
         with open(filename, "r") as f:
@@ -29,7 +33,13 @@ def write_config(starting_id, page_id, starting_cata_id, filename="config.txt"):
     except FileNotFoundError:
         pass
 
-    keys_found = {"starting_id": False, "page_id": False, "starting_cata_id": False}
+    keys_found = {
+        "starting_id": False,
+        "page_id": False,
+        "starting_cata_id": False,
+        "nitro_path": False
+    }
+
     for i, line in enumerate(lines):
         if line.strip().startswith("starting_id"):
             lines[i] = f"starting_id = {starting_id}\n"
@@ -40,6 +50,9 @@ def write_config(starting_id, page_id, starting_cata_id, filename="config.txt"):
         elif line.strip().startswith("starting_cata_id"):
             lines[i] = f"starting_cata_id = {starting_cata_id}\n"
             keys_found["starting_cata_id"] = True
+        elif line.strip().startswith("nitro_path"):
+            lines[i] = f"nitro_path = {nitro_path}\n"
+            keys_found["nitro_path"] = True
 
     if not keys_found["starting_id"]:
         lines.append(f"starting_id = {starting_id}\n")
@@ -47,6 +60,8 @@ def write_config(starting_id, page_id, starting_cata_id, filename="config.txt"):
         lines.append(f"page_id = {page_id}\n")
     if not keys_found["starting_cata_id"]:
         lines.append(f"starting_cata_id = {starting_cata_id}\n")
+    if not keys_found["nitro_path"] and nitro_path:
+        lines.append(f"nitro_path = {nitro_path}\n")
 
     with open(filename, "w") as f:
         f.writelines(lines)
@@ -148,12 +163,22 @@ def generate_sql(nitro_path, filenames, starting_id, starting_cata_id, page_id, 
 
 
 def main():
-    nitro_path = r"C:\Users\ger\Desktop\dev\furnidata generator\furni"
     config_file = "config.txt"
     output_folder = "output"
 
-    starting_id, page_id, starting_cata_id = read_config(config_file)
+    starting_id, page_id, starting_cata_id, nitro_path = read_config(config_file)
+    
+    # Path invalid
+    if not nitro_path or not os.path.exists(nitro_path):
+        print(f"Error: Your nitro_path '{nitro_path}' is invalid or does not exist.")
+        sys.exit(1)
+    
     filenames = get_nitro_filenames(nitro_path)
+
+    # Path does not contain any .nitro files
+    if not filenames:
+        print(f"Error: There are no .nitro files found in '{nitro_path}'.")
+        sys.exit(1)
 
     print("Generating furnidata...")
     end_id_furnidata = generate_furnidata(nitro_path, filenames, starting_id, output_folder)
@@ -165,10 +190,11 @@ def main():
 
     # Update ids
     final_starting_id = max(end_id_furnidata, end_id_sql)
-    write_config(final_starting_id, page_id, end_cata_id_sql, config_file)
+    write_config(final_starting_id, page_id, end_cata_id_sql, nitro_path, config_file)
 
     print("Completed!")
 
 
 if __name__ == "__main__":
     main()
+
