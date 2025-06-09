@@ -140,7 +140,7 @@ def generate_sql(nitro_path, filenames, starting_id, starting_cata_id, page_id, 
                 "`interaction_type`, `interaction_modes_count`, `vending_ids`, `multiheight`, "
                 "`customparams`, `effect_id_male`, `effect_id_female`, `clothing_on_walk`, `page_id`, `rare`) VALUES "
                 f"('{current_id}', '{current_id}', '{name}', '{name}', 1, 1, 1.00, '0', '0', '0', '0', '1', '1', "
-                "'0', '0', '1', 's', 'default', 2, '', '', '', 0, 0, ''. NULL, '0');"
+                "'0', '0', '1', 's', 'default', 1, '', '', '', 0, 0, '', NULL, '0');"
             )
 
             # Default cost = 50 duckets
