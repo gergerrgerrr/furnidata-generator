@@ -17,6 +17,7 @@ Requirements:
 
 To run this script:
 Open command prompt at the main folder and run ```python generateall.py```
-  - The script will read all .nitro files in "/furni" and use those furniture names to generate your output .txts
+  - The script will read all .nitro files in "/furni" and use those furniture names to generate your output texts.
   - Your starting_id and starting_cata_id would have auto increment so you only have to change the page_id in the future.
+  - The /output folder will be created for you the first time you run the script.
   
