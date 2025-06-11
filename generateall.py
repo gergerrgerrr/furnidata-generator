@@ -8,24 +8,65 @@ def read_config(filename="config.txt"):
     page_id = 1
     starting_cata_id = 1
     nitro_path = ""
+    cost_credits = None
+    cost_points = None
+    points_type = None
+
     try:
         with open(filename, "r") as f:
             for line in f:
                 line = line.strip()
-                if line.startswith("starting_id"):
-                    starting_id = int(line.split("=")[1].strip())
-                elif line.startswith("page_id"):
-                    page_id = int(line.split("=")[1].strip())
-                elif line.startswith("starting_cata_id"):
-                    starting_cata_id = int(line.split("=")[1].strip())
-                elif line.startswith("nitro_path"):
-                    nitro_path = line.split("=", 1)[1].strip()
+                # Ignoring the comments which starts with '#'
+                if not line or line.startswith("#"):
+                    continue
+
+                key_value = line.split("=", 1)
+                if len(key_value) != 2:
+                    continue
+
+                key = key_value[0].strip()
+                value = key_value[1].strip()
+
+                if key == "starting_id" and value:
+                    starting_id = int(value)
+                elif key == "page_id" and value:
+                    page_id = int(value)
+                elif key == "starting_cata_id" and value:
+                    starting_cata_id = int(value)
+                elif key == "nitro_path" and value:
+                    nitro_path = value
+                elif key == "cost_credits":
+                    if value:
+                        cost_credits = int(value)
+                elif key == "cost_points":
+                    if value:
+                        cost_points = int(value)
+                elif key == "points_type":
+                    if value:
+                        points_type = int(value)
+
+
     except (FileNotFoundError, ValueError):
         pass
-    return starting_id, page_id, starting_cata_id, nitro_path
+
+    # Alert to user that default costs have been used
+    if cost_credits is None:
+        cost_credits = 0
+        print("[ALERT] As you did not specify 'cost_credits', default value (0) is used.")
+
+    if cost_points is None:
+        cost_points = 50
+        print("[ALERT] As you did not specify 'cost_points', default value (50) is used.")
+
+    if points_type is None:
+        points_type = 0
+        print("[ALERT] As you did not specify 'points_type', default value (0) is used.")
+
+    return starting_id, page_id, starting_cata_id, nitro_path, cost_credits, cost_points, points_type
 
 
-def write_config(starting_id, page_id, starting_cata_id, nitro_path="", filename="config.txt"):
+def write_config(starting_id, page_id, starting_cata_id, nitro_path="", cost_credits=0,
+                  cost_points=50, points_type=0, filename="config.txt"):
     lines = []
     try:
         with open(filename, "r") as f:
@@ -37,7 +78,10 @@ def write_config(starting_id, page_id, starting_cata_id, nitro_path="", filename
         "starting_id": False,
         "page_id": False,
         "starting_cata_id": False,
-        "nitro_path": False
+        "nitro_path": False,
+        "cost_credits": False,
+        "cost_points": False,
+        "points_type": False,
     }
 
     for i, line in enumerate(lines):
@@ -53,6 +97,15 @@ def write_config(starting_id, page_id, starting_cata_id, nitro_path="", filename
         elif line.strip().startswith("nitro_path"):
             lines[i] = f"nitro_path = {nitro_path}\n"
             keys_found["nitro_path"] = True
+        elif line.strip().startswith("cost_credits"):
+            lines[i] = f"cost_credits = {cost_credits}\n"
+            keys_found["cost_credits"] = True
+        elif line.strip().startswith("cost_points"):
+            lines[i] = f"cost_points = {cost_points}\n"
+            keys_found["cost_points"] = True
+        elif line.strip().startswith("points_type"):
+            lines[i] = f"points_type = {points_type}\n"
+            keys_found["points_type"] = True
 
     if not keys_found["starting_id"]:
         lines.append(f"starting_id = {starting_id}\n")
@@ -62,6 +115,12 @@ def write_config(starting_id, page_id, starting_cata_id, nitro_path="", filename
         lines.append(f"starting_cata_id = {starting_cata_id}\n")
     if not keys_found["nitro_path"] and nitro_path:
         lines.append(f"nitro_path = {nitro_path}\n")
+    if not keys_found["cost_credits"]:
+        lines.append(f"cost_credits = {cost_credits}\n")
+    if not keys_found["cost_points"]:
+        lines.append(f"cost_points = {cost_points}\n")
+    if not keys_found["points_type"]:
+        lines.append(f"points_type = {points_type}\n")
 
     with open(filename, "w") as f:
         f.writelines(lines)
@@ -120,7 +179,9 @@ def generate_furnidata(nitro_path, filenames, starting_id, output_folder="output
     return current_id
 
 
-def generate_sql(nitro_path, filenames, starting_id, starting_cata_id, page_id, output_folder="output"):
+def generate_sql(nitro_path, filenames, starting_id, starting_cata_id,
+                 page_id, output_folder="output", cost_credits=0,
+                 cost_points=50, points_type=0):
     os.makedirs(output_folder, exist_ok=True)
     items_base_file = os.path.join(output_folder, "items_base_sql.txt")
     catalog_items_file = os.path.join(output_folder, "catalog_items_sql.txt")
@@ -150,7 +211,7 @@ def generate_sql(nitro_path, filenames, starting_id, starting_cata_id, page_id, 
                 "`cost_credits`, `cost_points`, `points_type`, `amount`, `limited_sells`, `limited_stack`, "
                 "`extradata`, `badge`, `have_offer`, `club_only`, `rate`) VALUES "
                 f"('{cata_id}', '{current_id}', '{page_id}', '{current_id}', 0, 99, '{name}', "
-                "'0', 50, 0, 1, 0, 0, '', NULL, '1', '0', NULL);"
+                f"{cost_credits}, {cost_points}, {points_type}, 1, 0, 0, '', NULL, '1', '0', NULL);"
             )
 
             items_file.write(items_query + "\n")
@@ -166,7 +227,10 @@ def main():
     config_file = "config.txt"
     output_folder = "output"
 
-    starting_id, page_id, starting_cata_id, nitro_path = read_config(config_file)
+    (
+        starting_id, page_id, starting_cata_id,
+        nitro_path, cost_credits, cost_points, points_type
+    ) = read_config(config_file)
     
     # Path invalid
     if not nitro_path or not os.path.exists(nitro_path):
@@ -185,13 +249,17 @@ def main():
 
     print("Generating SQL...")
     end_id_sql, end_cata_id_sql = generate_sql(
-        nitro_path, filenames, starting_id, starting_cata_id, page_id, output_folder
+        nitro_path, filenames, starting_id, starting_cata_id, page_id, output_folder,
+        cost_credits, cost_points, points_type
     )
 
     # Update ids
     final_starting_id = max(end_id_furnidata, end_id_sql)
-    write_config(final_starting_id, page_id, end_cata_id_sql, nitro_path, config_file)
-
+    write_config(
+        final_starting_id, page_id, end_cata_id_sql,
+        nitro_path, cost_credits, cost_points, points_type, config_file
+    )
+    
     print("Completed!")
 
 
