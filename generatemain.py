@@ -7,7 +7,7 @@ def read_config(filename="config.txt"):
     starting_id = 1
     page_id = 1
     starting_cata_id = 1
-    nitro_path = ""
+    floor_items_path = ""
     cost_credits = None
     cost_points = None
     points_type = None
@@ -33,8 +33,8 @@ def read_config(filename="config.txt"):
                     page_id = int(value)
                 elif key == "starting_cata_id" and value:
                     starting_cata_id = int(value)
-                elif key == "nitro_path" and value:
-                    nitro_path = value
+                elif key == "floor_items_path" and value:
+                    floor_items_path = value
                 elif key == "cost_credits":
                     if value:
                         cost_credits = int(value)
@@ -62,10 +62,10 @@ def read_config(filename="config.txt"):
         points_type = 0
         print("[ALERT] As you did not specify 'points_type', default value (0) is used.")
 
-    return starting_id, page_id, starting_cata_id, nitro_path, cost_credits, cost_points, points_type
+    return starting_id, page_id, starting_cata_id, floor_items_path, cost_credits, cost_points, points_type
 
 
-def write_config(starting_id, page_id, starting_cata_id, nitro_path="", cost_credits=0,
+def write_config(starting_id, page_id, starting_cata_id, floor_items_path="", cost_credits=0,
                   cost_points=50, points_type=0, filename="config.txt"):
     lines = []
     try:
@@ -78,7 +78,7 @@ def write_config(starting_id, page_id, starting_cata_id, nitro_path="", cost_cre
         "starting_id": False,
         "page_id": False,
         "starting_cata_id": False,
-        "nitro_path": False,
+        "floor_items_path": False,
         "cost_credits": False,
         "cost_points": False,
         "points_type": False,
@@ -94,9 +94,9 @@ def write_config(starting_id, page_id, starting_cata_id, nitro_path="", cost_cre
         elif line.strip().startswith("starting_cata_id"):
             lines[i] = f"starting_cata_id = {starting_cata_id}\n"
             keys_found["starting_cata_id"] = True
-        elif line.strip().startswith("nitro_path"):
-            lines[i] = f"nitro_path = {nitro_path}\n"
-            keys_found["nitro_path"] = True
+        elif line.strip().startswith("floor_items_path"):
+            lines[i] = f"floor_items_path = {floor_items_path}\n"
+            keys_found["floor_items_path"] = True
         elif line.strip().startswith("cost_credits"):
             lines[i] = f"cost_credits = {cost_credits}\n"
             keys_found["cost_credits"] = True
@@ -113,8 +113,8 @@ def write_config(starting_id, page_id, starting_cata_id, nitro_path="", cost_cre
         lines.append(f"page_id = {page_id}\n")
     if not keys_found["starting_cata_id"]:
         lines.append(f"starting_cata_id = {starting_cata_id}\n")
-    if not keys_found["nitro_path"] and nitro_path:
-        lines.append(f"nitro_path = {nitro_path}\n")
+    if not keys_found["floor_items_path"] and floor_items_path:
+        lines.append(f"floor_items_path = {floor_items_path}\n")
     if not keys_found["cost_credits"]:
         lines.append(f"cost_credits = {cost_credits}\n")
     if not keys_found["cost_points"]:
@@ -126,14 +126,14 @@ def write_config(starting_id, page_id, starting_cata_id, nitro_path="", cost_cre
         f.writelines(lines)
 
 
-def get_nitro_filenames(nitro_path):
+def get_nitro_filenames(floor_items_path):
     return [
-        f for f in os.listdir(nitro_path)
-        if os.path.isfile(os.path.join(nitro_path, f)) and f.lower().endswith(".nitro")
+        f for f in os.listdir(floor_items_path)
+        if os.path.isfile(os.path.join(floor_items_path, f)) and f.lower().endswith(".nitro")
     ]
 
 
-def generate_furnidata(nitro_path, filenames, starting_id, output_folder="output"):
+def generate_furnidata(floor_items_path, filenames, starting_id, output_folder="output"):
     os.makedirs(output_folder, exist_ok=True)
     output_file = os.path.join(output_folder, "furnidata.txt")
 
@@ -179,7 +179,7 @@ def generate_furnidata(nitro_path, filenames, starting_id, output_folder="output
     return current_id
 
 
-def generate_sql(nitro_path, filenames, starting_id, starting_cata_id,
+def generate_sql(floor_items_path, filenames, starting_id, starting_cata_id,
                  page_id, output_folder="output", cost_credits=0,
                  cost_points=50, points_type=0):
     os.makedirs(output_folder, exist_ok=True)
@@ -229,27 +229,27 @@ def main():
 
     (
         starting_id, page_id, starting_cata_id,
-        nitro_path, cost_credits, cost_points, points_type
+        floor_items_path, cost_credits, cost_points, points_type
     ) = read_config(config_file)
     
     # Path invalid
-    if not nitro_path or not os.path.exists(nitro_path):
-        print(f"Error: Your nitro_path '{nitro_path}' is invalid or does not exist.")
+    if not floor_items_path or not os.path.exists(floor_items_path):
+        print(f"Error: Your floor_items_path '{floor_items_path}' is invalid or does not exist.")
         sys.exit(1)
     
-    filenames = get_nitro_filenames(nitro_path)
+    filenames = get_nitro_filenames(floor_items_path)
 
     # Path does not contain any .nitro files
     if not filenames:
-        print(f"Error: There are no .nitro files found in '{nitro_path}'.")
+        print(f"Error: There are no .nitro files found in '{floor_items_path}'.")
         sys.exit(1)
 
     print("Generating furnidata...")
-    end_id_furnidata = generate_furnidata(nitro_path, filenames, starting_id, output_folder)
+    end_id_furnidata = generate_furnidata(floor_items_path, filenames, starting_id, output_folder)
 
     print("Generating SQL...")
     end_id_sql, end_cata_id_sql = generate_sql(
-        nitro_path, filenames, starting_id, starting_cata_id, page_id, output_folder,
+        floor_items_path, filenames, starting_id, starting_cata_id, page_id, output_folder,
         cost_credits, cost_points, points_type
     )
 
@@ -257,7 +257,7 @@ def main():
     final_starting_id = max(end_id_furnidata, end_id_sql)
     write_config(
         final_starting_id, page_id, end_cata_id_sql,
-        nitro_path, cost_credits, cost_points, points_type, config_file
+        floor_items_path, cost_credits, cost_points, points_type, config_file
     )
     
     print("Completed!")

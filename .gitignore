@@ -1,0 +1,11 @@
+# Ignore "flooritems" and "wallitems" content
+furni/flooritems/*
+!furni/flooritems/.gitkeep
+
+furni/wallitems/*
+!furni/wallitems/.gitkeep
+
+# Ignore pycache
+__pycache__/
+*.pyc 
+*.pyo

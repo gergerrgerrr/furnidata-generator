@@ -1,15 +1,16 @@
 # Nitro Path
-nitro_path = YOUR PATH HERE
+floor_items_path = C:\Users\ger\Desktop\furnidata generator\furni\floor_items
+wall_items_path = C:\Users\ger\Desktop\furnidata generator\furni\wall_items
 
 # SQL Configuration
 page_id = 111
-starting_id = 1
-starting_cata_id = 1
+starting_id = 241
+starting_cata_id = 241
 
 # Catalog Items Costs
 # Default values: cost_credits=0, cost_points=50, points_type=0
 # points_type; 0 = duckets, 5 = diamonds OR your custom currency point value (if any).
-cost_credits = 
-cost_points = 
-points_type = 
+cost_credits = 0
+cost_points = 50
+points_type = 0
 
