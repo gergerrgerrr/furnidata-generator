@@ -14,10 +14,13 @@ I made this for people who do not have automated furniture adding in their house
 Things that you should know:
 1. You will need **Python 3.x**
 2. Furnitures in **.nitro** to put into the "**/furni**" folder;
+   - **/furni/floor_items** for Floor Items.
+   - **/furni/wall_items** for Wall Items.
 3. Do remember to edit the "**config.txt**"
 
 **config.txt** configuration details:
-- **nitro_path** = Path to the **/furni** folder.
+- **floor_items_path** = Path to the **/furni/floor_items** folder.
+- **wall_items_path** = Path to the **/furni/wall_items** folder.
 - **page_id** = The page id that you want the furnitures to be under. **Note that this value will not change by itself and you have to modify it whenever necessary.**
 - **starting_id** = The starting id for your items_base/furnidata id.
 - **starting_cata_id** = Some sprite_ids might not match your cata_ids, so this would solve the issue.
@@ -28,8 +31,8 @@ Please note that if you leave these parameters empty, the default values for the
 - **points_type** = Points type for furniture in `catalog_items` (0 = duckets, 5 = diamonds OR your own currency point value if applicable.)
 
 To run this script:
-Open command prompt at the main folder and run ```python generatemain.py```
-  - The script will read all **.nitro** files in "**/furni**" and use those furniture names to generate your output texts.
+Open command prompt at the main folder and run ```python generatemain.py``` for Floor Items and ```python generatewall.py``` for Wall Items.
+  - The script will read all **.nitro** files in "**/furni/{floor/wall}_items**" and use those furniture names to generate your output texts.
   - Your **starting_id** and **starting_cata_id** would have auto increment so you only have to change the **page_id** in the future.
   - The **/output** folder will be created for you the first time you run the script.
 
