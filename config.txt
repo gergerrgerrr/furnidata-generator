@@ -1,6 +1,6 @@
 # Nitro Path
-floor_items_path = C:\Users\ger\Desktop\furnidata generator\furni\floor_items
-wall_items_path = C:\Users\ger\Desktop\furnidata generator\furni\wall_items
+floor_items_path = YOUR PATH HERE
+wall_items_path = YOUR PATH HERE
 
 # SQL Configuration
 page_id = 111
